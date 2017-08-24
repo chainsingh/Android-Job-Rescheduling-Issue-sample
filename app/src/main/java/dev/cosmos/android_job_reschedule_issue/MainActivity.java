@@ -4,16 +4,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.View;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
@@ -28,12 +23,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new Handler().postDelayed(new Runnable() {
+        findViewById(R.id.test).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                scheduleJob(20000); //SCHEDULE FIRST JOB TO RUN IN 20 SECONDS
+            public void onClick(View view) {
+                new JobRequest.Builder("Random")
+                    .setExecutionWindow(1L, 1_000L)
+                    .setBackoffCriteria(30_000L, JobRequest.BackoffPolicy.EXPONENTIAL)
+                    .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
+                    .setRequirementsEnforced(true)
+                    .setPersisted(true)
+                    .build()
+                    .schedule();
             }
-        }, 10000); //WAIT 10 SECONDS SINCE ACTIVITY START TO SCHEDULE FIRST JOB
+        });
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                scheduleJob(20000); //SCHEDULE FIRST JOB TO RUN IN 20 SECONDS
+//            }
+//        }, 10000); //WAIT 10 SECONDS SINCE ACTIVITY START TO SCHEDULE FIRST JOB
     }
 
 
@@ -52,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
         protected Result onRunJob(Params params) {
 
             //show notification
-            createNotificationForReminderAndShow(getContext());
+            //createNotificationForReminderAndShow(getContext());
 
             //schedule next job in 1 minute
-            scheduleJob(60000);
+            //scheduleJob(60000);
 
             return Result.SUCCESS;
         }
